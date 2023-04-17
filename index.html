@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+<body>
+  <!-- HTML form -->
+  <form id="my-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" maxlength="32"><br>
+
+    <label for="addressline1">Address Line 1:</label>
+    <input type="text" id="addressline1" name="addressline1" maxlength="36"><br>
+
+    <label for="addressline2">Address Line 2:</label>
+    <input type="text" id="addressline2" name="addressline2" maxlength="36"><br>
+
+    <label for="addressline3">Address Line 3:</label>
+    <input type="text" id="addressline3" name="addressline3" maxlength="36"><br>
+
+    <label for="gsdnumber">GSD Number:</label>
+    <input type="text" id="gsdnumber" name="gsdnumber" maxlength="30"><br>
+
+    <label for="billno">Bill No:</label>
+    <input type="number" id="billno" name="billno"><br>
+
+    <label for="billdate">Bill Date:</label>
+    <input type="date" id="billdate" name="billdate" value="{{(new Date()).toISOString().substr(0,10)}}"><br>
+
+    <button type="submit">Generate PDF</button>
+  </form>
+  <button onclick="downloadform()">Download Form</button>
+   <a href="TAX-INVOICE.pdf" download> ttest</a>
+
+  <!-- Script to generate PDF -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.16.0/pdf-lib.min.js"></script>
+
+  <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+
+
+  <script>
+    const form = document.getElementById("my-form");
+    form.addEventListener("submit", generatePDF);
+
+    async function generatePDF(event) {
+      event.preventDefault();
+
+      // Retrieve form data
+      const name = document.getElementById("name").value;
+      const addressline1 = document.getElementById("addressline1").value;
+      const addressline2 = document.getElementById("addressline2").value;
+      const addressline3 = document.getElementById("addressline3").value;
+      const billno = document.getElementById("billno").value;
+      const billdate = document.getElementById("billdate").value;
+      const gsdnumber = document.getElementById("gsdnumber").value;
+
+      // Load PDF template
+      //const pdfDoc = await PDFLib.PDFDocument.load("TAX-INVOICE.pdf");
+
+      // Fetch the PDF file as an array buffer
+      const response = await fetch("TAX-INVOICE.pdf");
+      const arrayBuffer = await response.arrayBuffer();
+
+      // Load the PDF document from array buffer
+      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+      // Get page 1 of the PDF template
+      const page = pdfDoc.getPages()[0];
+
+      // Embed the Helvetica font
+      const helveticaFont = await pdfDoc.embedFont('Helvetica');
+
+      // Add user input to the PDF template
+      
+      page.setFontSize(16);
+
+      page.drawText(name, { x: 68, y: 632,});
+      page.drawText(addressline1, { x: 44,y: 610});
+      page.drawText(addressline2, { x: 44,y: 588});
+      page.drawText(addressline3, { x: 44,y: 566});
+
+      page.drawText(gsdnumber, { x: 85,y: 536});
+      
+
+      page.setFontSize(12);
+      page.drawText(billno, { x: 470, y: 659, fontSize: 74});
+      page.drawText(billdate, { x: 470, y: 624, fontSize: 74});
+
+
+
+
+      // Save PDF as blob
+      const pdfBytes = await pdfDoc.save();
+
+      // Create URL for the PDF blob
+      const pdfUrl = URL.createObjectURL(new Blob([pdfBytes], { type: "application/pdf" }));
+
+      // Embed PDF in HTML
+      const pdfEmbed = `<object data="${pdfUrl}" type="application/pdf" width="100%" height="600px">
+                        <p>PDF cannot be displayed.</p>
+                      </object>`;
+      document.getElementById("pdf-container").innerHTML = pdfEmbed;
+    }
+  </script>
+
+  <!-- Container for the PDF -->
+  <div id="pdf-container"></div>
+</body>
+</html>
+
+
