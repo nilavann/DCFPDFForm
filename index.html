@@ -29,10 +29,86 @@
     <label for="billdate">Bill Date:</label>
     <input type="date" id="billdate" name="billdate" value="{{(new Date()).toISOString().substr(0,10)}}"><br>
 
+    <table>
+      <thead>
+        <tr>
+          <th>CNS No</th>
+          <th>Date</th>
+          <th>Pkgs</th>
+          <th>To Station</th>
+          <th>Consignor/Consignee</th>
+          <th>Freight</th>
+          <th>Other charges</th>
+          <!--<th>Total Amount</th>-->
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="number" name="cns_no[]" max="99999999"/></td>
+          <td><input type="date" name="date[]" /></td>
+          <td><input type="number" name="pkgs[]"  max="99999"/></td>
+          <td><input type="text" name="to_station[]" maxlength="7" /></td>
+          <td><input type="text" name="consignor_consignee[]" maxlength="20" /></td>
+          <td><input type="number" name="freight[]" max="99999999" /></td>
+          <td><input type="text" name="other_charges[]" max="9999" /></td>
+          <!--<td><input type="text" name="total_amount[]" max="999999999" /></td>-->
+        </tr>
+        <tr>
+          <td><input type="number" name="cns_no[]" max="99999999"/></td>
+          <td><input type="date" name="date[]" /></td>
+          <td><input type="number" name="pkgs[]"  max="99999"/></td>
+          <td><input type="text" name="to_station[]" maxlength="7" /></td>
+          <td><input type="text" name="consignor_consignee[]" maxlength="20" /></td>
+          <td><input type="number" name="freight[]" max="99999999" /></td>
+          <td><input type="text" name="other_charges[]" max="9999" /></td>
+          <!--<td><input type="text" name="total_amount[]" max="999999999" /></td>-->
+        </tr>
+        <tr>
+          <td><input type="number" name="cns_no[]" max="99999999"/></td>
+          <td><input type="date" name="date[]" /></td>
+          <td><input type="number" name="pkgs[]"  max="99999"/></td>
+          <td><input type="text" name="to_station[]" maxlength="7" /></td>
+          <td><input type="text" name="consignor_consignee[]" maxlength="20" /></td>
+          <td><input type="number" name="freight[]" max="99999999" /></td>
+          <td><input type="text" name="other_charges[]" max="9999" /></td>
+          <!--<td><input type="text" name="total_amount[]" max="999999999" /></td>-->
+        </tr>
+        <tr>
+          <td><input type="number" name="cns_no[]" max="99999999"/></td>
+          <td><input type="date" name="date[]" /></td>
+          <td><input type="number" name="pkgs[]"  max="99999"/></td>
+          <td><input type="text" name="to_station[]" maxlength="7" /></td>
+          <td><input type="text" name="consignor_consignee[]" maxlength="20" /></td>
+          <td><input type="number" name="freight[]" max="99999999" /></td>
+          <td><input type="text" name="other_charges[]" max="9999" /></td>
+          <!--<td><input type="text" name="total_amount[]" max="999999999" /></td>-->
+        </tr>
+        <tr>
+          <td><input type="number" name="cns_no[]" max="99999999"/></td>
+          <td><input type="date" name="date[]" /></td>
+          <td><input type="number" name="pkgs[]"  max="99999"/></td>
+          <td><input type="text" name="to_station[]" maxlength="7" /></td>
+          <td><input type="text" name="consignor_consignee[]" maxlength="20" /></td>
+          <td><input type="number" name="freight[]" max="99999999" /></td>
+          <td><input type="text" name="other_charges[]" max="9999" /></td>
+          <!--<td><input type="text" name="total_amount[]" max="999999999" /></td>-->
+        </tr>
+      </tbody>
+    </table>
+
+    <input type="checkbox" name="CGST" id="cgst" value="cgst">
+    <label for="cgst">CGST</label><br>
+
+    <input type="checkbox" name="SGST" id="sgst" value="sgst">
+    <label for="sgst">SGST</label><br>
+
+    <input type="checkbox" name="IGST" id="igst" value="igst">
+    <label for="igst">IGST</label><br>
+
     <button type="submit">Generate PDF</button>
   </form>
-  <button onclick="downloadform()">Download Form</button>
-   <a href="TAX-INVOICE.pdf" download> ttest</a>
+  <!--<button onclick="downloadform()">Download Form</button>-->
+  <!--<a href="TAX-INVOICE.pdf" download> ttest</a> -->
 
   <!-- Script to generate PDF -->
 
@@ -90,7 +166,53 @@
       page.drawText(billdate, { x: 470, y: 624, fontSize: 74});
 
 
+      // Select all the rows in the table body
+      const rows = document.querySelectorAll('tbody tr');
 
+      var table_y = 447;
+      var totalCost = 0;
+      // Loop through each row and extract the column values
+      rows.forEach(row => {
+
+      const cnsNo = row.querySelector('input[name="cns_no[]"]').value;
+      const date = row.querySelector('input[name="date[]"]').value;
+      const pkgs = row.querySelector('input[name="pkgs[]"]').value;
+      const toStation = row.querySelector('input[name="to_station[]"]').value;
+      const consignorConsignee = row.querySelector('input[name="consignor_consignee[]"]').value;
+      const freightInput = row.querySelector('input[name="freight[]"]');
+      const freight = (freightInput.value).trim() === '' ? 0 : parseFloat(freightInput.value);
+      const otherChargesInput = row.querySelector('input[name="other_charges[]"]');
+      const otherCharges = (otherChargesInput.value).trim() === '' ? 0 : parseFloat(otherChargesInput.value);
+      var totalAmount = freight+otherCharges;
+
+      
+      // Do something with the column values (e.g. log them to the console)
+      console.log(cnsNo, date, pkgs, toStation, consignorConsignee, freight, otherCharges, totalAmount);
+
+      page.drawText(cnsNo, { x: 44,y: table_y});
+      page.drawText(date,  { x: 104,y: table_y});
+      page.drawText(pkgs, { x: 172,y: table_y});
+      page.drawText(toStation, { x: 210,y: table_y});
+      page.drawText(consignorConsignee, { x: 254,y: table_y});
+      page.drawText(freight.toString(), { x: 372,y: table_y});
+      page.drawText(otherCharges.toString(), { x: 444,y: table_y});
+      page.drawText(totalAmount.toString(), { x: 490,y: table_y});
+
+      table_y -= 24;
+      totalCost += totalAmount;
+
+      });
+
+      page.drawText(totalCost.toString(), { x: 490,y: table_y + 6});
+
+      const cgst = document.getElementById("cgst").value === 'cgst' ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
+      const sgst = document.getElementById("sgst").value === 'sgst' ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
+      const igst = document.getElementById("igst").value === 'igst' ?  (( 5/100) * totalCost).toFixed(2) : 0;
+      
+
+      page.drawText(cgst.toString(), { x: 108,y: 307});
+      page.drawText(sgst.toString(), { x: 108,y: 280});
+      page.drawText(igst.toString(), { x: 108,y: 253});
 
       // Save PDF as blob
       const pdfBytes = await pdfDoc.save();
