@@ -6,29 +6,49 @@
   <title></title>
 </head>
 <body>
+  <div class="navbar">
+  <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Dream Carrier Freight</a>
+  
+  </div>
   <!-- HTML form -->
+
   <form id="my-form">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" maxlength="32"><br>
 
-    <label for="addressline1">Address Line 1:</label>
-    <input type="text" id="addressline1" name="addressline1" maxlength="36"><br>
-
-    <label for="addressline2">Address Line 2:</label>
-    <input type="text" id="addressline2" name="addressline2" maxlength="36"><br>
-
-    <label for="addressline3">Address Line 3:</label>
-    <input type="text" id="addressline3" name="addressline3" maxlength="36"><br>
-
-    <label for="gsdnumber">GSD Number:</label>
-    <input type="text" id="gsdnumber" name="gsdnumber" maxlength="30"><br>
-
-    <label for="billno">Bill No:</label>
-    <input type="number" id="billno" name="billno"><br>
-
-    <label for="billdate">Bill Date:</label>
-    <input type="date" id="billdate" name="billdate" value="{{(new Date()).toISOString().substr(0,10)}}"><br>
-
+    <div class="form-container" style="padding-top: 20px;">
+      <div class="form-row">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" maxlength="32"><br>
+      </div>
+      <div class="form-row">
+        <label for="addressline1">Address Line 1:</label>
+        <input type="text" id="addressline1" name="addressline1" maxlength="36"><br>
+      </div>
+      <div class="form-row">
+        <label for="addressline2">Address Line 2:</label>
+        <input type="text" id="addressline2" name="addressline2" maxlength="36"><br>
+      </div>
+      <div class="form-row">
+        <label for="addressline3">Address Line 3:</label>
+        <input type="text" id="addressline3" name="addressline3" maxlength="36"><br>
+      </div>
+      <div class="form-row">
+        <label for="gsdnumber">GSD Number:</label>
+        <input type="text" id="gsdnumber" name="gsdnumber" maxlength="30"><br>
+      </div>
+      <div class="form-row">
+        <label for="billno">Bill No:</label>
+        <input type="number" id="billno" name="billno"><br>
+      </div>
+      <div class="form-row">
+        <label for="billdate">Bill Date:</label>
+        <input type="date" id="billdate" name="billdate" value="{{(new Date()).toISOString().substr(0,10)}}"><br>
+      </div>
+      <div class="form-row">
+        <label for="fromlocation">From-To Location:</label>
+        <input type="text" id="fromlocation" name="fromlocation"  maxlength="45"><br>
+      </div>
+    </div>
+    
     <table>
       <thead>
         <tr>
@@ -96,20 +116,35 @@
       </tbody>
     </table>
 
-    <input type="checkbox" name="CGST" id="cgst" value="cgst">
-    <label for="cgst">CGST</label><br>
-
-    <input type="checkbox" name="SGST" id="sgst" value="sgst">
-    <label for="sgst">SGST</label><br>
-
-    <input type="checkbox" name="IGST" id="igst" value="igst">
-    <label for="igst">IGST</label><br>
-
-    <label for="gsdcustomer">GST on Reverse Charge to be paid by Customer:</label>
+    <div class="form-container" style="padding-top: 20px;">
+      <div class="form-row">
+        <input type="checkbox" name="CGST" id="cgst" value=""/>
+        <label for="cgst">CGST</label><br>
+      </div>
+      <div class="form-row">
+        <input type="checkbox" name="SGST" id="sgst" value=""/>
+        <label for="sgst">SGST</label><br>
+      </div>
+      <div class="form-row">
+        <input type="checkbox" name="IGST" id="igst" value=""/>
+        <label for="igst">IGST</label><br>
+      </div>
+      <div class="form-row">
+        <label for="comments">Comments</label><br>
+        <textarea id="comments" name="comments" rows="4" cols="60"></textarea><br>
+      </div>
+      <div class="form-row">
+        <label for="gsdcustomer">GST on Reverse Charge to be paid by Customer:</label>
     <input type="text" id="gsdcustomer" name="gsdcustomer" maxlength="50"><br>
+      </div>
+    </div>
     
-    <button type="submit">Generate PDF</button>
+    <button class="success-button" type="submit">Generate PDF</button>
   </form>
+
+  <!-- Container for the PDF -->
+  <div id="pdf-container"></div>
+
   <!--<button onclick="downloadform()">Download Form</button>-->
   <!--<a href="TAX-INVOICE.pdf" download> ttest</a> -->
 
@@ -135,6 +170,7 @@
       const billno = document.getElementById("billno").value;
       const billdate = document.getElementById("billdate").value;
       const gsdnumber = document.getElementById("gsdnumber").value;
+      const fromlocation = document.getElementById("fromlocation").value;
 
       // Load PDF template
       //const pdfDoc = await PDFLib.PDFDocument.load("TAX-INVOICE.pdf");
@@ -154,7 +190,7 @@
 
       // Add user input to the PDF template
       
-      page.setFontSize(16);
+      page.setFontSize(13);
 
       page.drawText(name, { x: 68, y: 632,});
       page.drawText(addressline1, { x: 44,y: 610});
@@ -167,6 +203,7 @@
       page.setFontSize(12);
       page.drawText(billno, { x: 470, y: 659, fontSize: 74});
       page.drawText(billdate, { x: 470, y: 624, fontSize: 74});
+      page.drawText(fromlocation, { x: 290, y: 511, fontSize: 74});
 
 
       // Select all the rows in the table body
@@ -208,16 +245,21 @@
 
       page.drawText(totalCost.toString(), { x: 490,y: table_y + 6});
 
-      const cgst = document.getElementById("cgst").value === 'cgst' ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
-      const sgst = document.getElementById("sgst").value === 'sgst' ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
-      const igst = document.getElementById("igst").value === 'igst' ?  (( 5/100) * totalCost).toFixed(2) : 0;
-      
+      const cgst = document.getElementById("cgst").checked ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
+      const sgst = document.getElementById("sgst").checked ?  (( 2.5/100) * totalCost).toFixed(2) : 0;
+      const igst = document.getElementById("igst").checked ?  (( 5/100) * totalCost).toFixed(2) : 0;
+      console.log("gst: " + document.getElementById("cgst").value);
 
       page.drawText(cgst.toString(), { x: 108,y: 307});
       page.drawText(sgst.toString(), { x: 108,y: 280});
       page.drawText(igst.toString(), { x: 108,y: 253});
 
-      
+      var comments = document.getElementById("comments").value;
+      page.drawText( getWholeWord(comments, 1, 65), { x: 180,y: 308});
+      page.drawText( getWholeWord(comments, 66, 131), { x: 180,y: 288});
+      page.drawText( getWholeWord(comments, 132, 197), { x: 180,y: 268});
+      page.drawText( getWholeWord(comments, 198, 263), { x: 180,y: 248});
+
       var gsdcustomer = document.getElementById("gsdcustomer").value;
       gsdcustomer = gsdcustomer.trim() === '' ? '' : gsdcustomer + ')';
 
@@ -324,10 +366,106 @@
       // Return the word
       return word;
     }
+
+    function updateValue() {
+  var checkbox = document.getElementById("myCheckbox");
+  if (checkbox.checked) {
+    checkbox.value = "newValue";
+  } else {
+    checkbox.value = "myValue";
+  }
+}
   </script>
 
-  <!-- Container for the PDF -->
-  <div id="pdf-container"></div>
+  
+
+  <style>
+    body {font-family: Arial, Helvetica, sans-serif;}
+
+    .navbar {
+      width: 100%;
+      background-color: #04AA6D;
+      overflow: auto;
+      }
+
+      .navbar a {
+        float: left;
+        padding: 12px;
+        color: white;
+        text-decoration: none;
+        font-size: 17px;
+      }
+
+      .navbar a:hover {
+        background-color: #000;
+      }
+
+      .active {
+        background-color: #04AA6D;
+      }
+
+      @media screen and (max-width: 500px) {
+        .navbar a {
+          float: none;
+          display: block;
+        }
+      }
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  width: 33%;
+  margin-left: 20px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+label {
+  width: 30%;
+}
+
+input, textarea {
+  width: 70%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid #333; /* light black border */
+  width: auto;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #333; /* light black border */
+  text-align: left;
+}
+
+th {
+  background-color: #eee; /* light gray background */
+}
+
+.success-button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+    </style>
 </body>
 </html>
 
