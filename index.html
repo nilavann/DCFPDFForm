@@ -105,6 +105,9 @@
     <input type="checkbox" name="IGST" id="igst" value="igst">
     <label for="igst">IGST</label><br>
 
+    <label for="gsdcustomer">GST on Reverse Charge to be paid by Customer:</label>
+    <input type="text" id="gsdcustomer" name="gsdcustomer" maxlength="50"><br>
+    
     <button type="submit">Generate PDF</button>
   </form>
   <!--<button onclick="downloadform()">Download Form</button>-->
@@ -214,6 +217,22 @@
       page.drawText(sgst.toString(), { x: 108,y: 280});
       page.drawText(igst.toString(), { x: 108,y: 253});
 
+      
+      var gsdcustomer = document.getElementById("gsdcustomer").value;
+      gsdcustomer = gsdcustomer.trim() === '' ? '' : gsdcustomer + ')';
+
+      page.drawText(gsdcustomer, { x: 240,y: 232});
+
+      console.log(totalCost);
+      const totalAmountInWords = numberToWordsIndian(totalCost);
+       console.log(totalAmountInWords);
+
+      page.setFontSize(14);
+      page.drawText( getWholeWord(totalAmountInWords, 1, 42), { x: 80,y: 207});
+      page.drawText( getWholeWord(totalAmountInWords, 43, 86), { x: 76,y: 188});
+
+      page.setFontSize(16);
+      page.drawText(totalCost.toString(), { x: 484,y: 193});
       // Save PDF as blob
       const pdfBytes = await pdfDoc.save();
 
@@ -225,6 +244,85 @@
                         <p>PDF cannot be displayed.</p>
                       </object>`;
       document.getElementById("pdf-container").innerHTML = pdfEmbed;
+    }
+
+    function numberToWordsIndian(num) {
+      if (num === 0) {
+        return 'Zero';
+      }
+      
+      let words = '';
+      const units = ['', 'Thousand', 'Lakh', 'Crore'];
+      const tensNames = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      const numNames = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+      
+      let i = 0;
+      while (num > 0) {
+        const n = num % 1000;
+        if (n !== 0) {
+          let temp = '';
+          if (n < 20) {
+            temp = numNames[n];
+          } else if (n >= 20 && n < 100) {
+            temp = tensNames[Math.floor(n / 10)];
+            if (n % 10 !== 0) {
+              temp += ' ' + numNames[n % 10];
+            }
+          } else {
+            temp = numNames[Math.floor(n / 100)] + ' Hundred';
+            if (n % 100 !== 0) {
+              temp += ' ' + tensNames[Math.floor((n % 100) / 10)];
+              if (n % 10 !== 0) {
+                temp += ' ' + numNames[n % 10];
+              }
+            }
+          }
+          words = temp + ' ' + units[i] + ' ' + words;
+        }
+        i++;
+        num = Math.floor(num / 1000);
+      }
+      return words;
+    }
+
+    function getWholeWord(str, start, end) {
+      
+      let strlen = str.length;
+
+      if( start >= strlen)
+        return '';
+
+      console.log('here');
+      // Find the position of the first non-alphabetic character before the start position
+      let startPos = start;
+      while (startPos > 0 && !(str[startPos - 1].match(/[ ]/))) {
+        startPos--;
+      }
+      
+      // Find the position of the first non-alphabetic character after the end position
+      let endPos = end;
+      if( endPos >= strlen){
+        endPos = strlen;
+      }else{
+        
+        while ( !str[endPos].match(/[ ]/)) {
+          endPos--;
+        }
+      }
+      
+      // Extract the word between the two positions
+      let word = str.slice(startPos, endPos);
+      
+      // If the end position falls within the word, trim it to the end of the word
+      if (endPos > end) {
+        let wordEnd = word.search(/\W/);
+        if (wordEnd > 0) {
+          word = word.slice(0, wordEnd);
+        }
+      }
+      
+      // Return the word
+      return word;
     }
   </script>
 
